@@ -1,0 +1,12 @@
+// Package pages
+package pages
+
+import "masakcook/views/layouts"
+
+templ Index() {
+	@layouts.Base("Hello World") {
+		<div>
+			<h1 class="text-orange-800">Hello World</h1>
+		</div>
+	}
+}

@@ -1,0 +1,5 @@
+@reference "../global.css";
+
+.test {
+	@apply text-orange-50;
+}

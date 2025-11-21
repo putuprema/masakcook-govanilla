@@ -1,14 +1,31 @@
 // Package layouts
 package layouts
 
-templ Base(title string) {
+import "masakcook/internal/viewmodel"
+import "strings"
+
+templ Base(meta *viewmodel.Metadata) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link rel="stylesheet" href="/static/styles/global.css"/>
-			<title>{ title }</title>
+			if meta != nil {
+				<title>{ meta.Title }</title>
+				<meta name="description" content={ meta.Description }/>
+				<meta name="author" content={ strings.Join(meta.Authors, ",") }/>
+				<meta name="keywords" content={ strings.Join(meta.Keywords, ",") }/>
+				<meta property="og:title" content={ meta.OpenGraphTitle }/>
+				<meta property="og:description" content={ meta.OpenGraphDesc }/>
+				<meta property="og:site_name" content="MasakCook"/>
+				<meta property="og:type" content="website"/>
+				<meta name="twitter:card" content="summary_large_image"/>
+				<meta name="twitter:title" content={ meta.TwitterTitle }/>
+				<meta name="twitter:description" content={ meta.TwitterDesc }/>
+			} else {
+				<title>MasakCook</title>
+			}
 		</head>
 		<body>
 			<main>

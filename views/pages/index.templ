@@ -2,9 +2,23 @@
 package pages
 
 import "masakcook/views/layouts"
+import "masakcook/internal/viewmodel"
+
+func Metadata() *viewmodel.Metadata {
+	return &viewmodel.Metadata{
+		Title:          "MasakCook - Discover & Share Amazing Recipes",
+		Description:    "Discover thousands of delicious recipes from home cooks around the world. Search by ingredient, cuisine, or diet. Save your favorites and share your own creations!",
+		Keywords:       []string{"recipes", "cooking", "food"},
+		Authors:        []string{"Putu Prema"},
+		OpenGraphTitle: "MasakCook - Discover & Share Amazing Recipes",
+		OpenGraphDesc:  "Discover thousands of delicious recipes from home cooks around the world.",
+		TwitterTitle:   "MasakCook - Discover & Share Amazing Recipes",
+		TwitterDesc:    "Discover thousands of delicious recipes from home cooks around the world.",
+	}
+}
 
 templ Index() {
-	@layouts.Base("Hello World") {
+	@layouts.Base(Metadata()) {
 		<div>
 			<h1 class="text-orange-800">Hello World</h1>
 		</div>

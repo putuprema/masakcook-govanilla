@@ -2,9 +2,12 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"masakcook/internal/config"
+	"masakcook/internal/data"
+	"masakcook/internal/viewmodel"
 	"masakcook/views/pages"
 
 	"github.com/a-h/templ"
@@ -26,7 +29,25 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir(cfg.StaticDir))))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		templ.Handler(pages.Index()).ServeHTTP(w, r)
+		vm := &viewmodel.IndexViewModel{
+			RecipeOfTheDay:  data.GetRecipeOfTheDay(),
+			TrendingRecipes: data.GetTrendingRecipes(12),
+			Categories:      data.GetCategories(),
+		}
+		templ.Handler(pages.Index(vm)).ServeHTTP(w, r)
+	})
+
+	r.Get("/api/recipes/search", func(w http.ResponseWriter, r *http.Request) {
+		keyword := r.URL.Query().Get("keyword")
+		category := r.URL.Query().Get("category")
+
+		results := data.SearchRecipes(keyword, category)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"data":  results,
+			"count": len(results),
+		})
 	})
 
 	if err := http.ListenAndServe(":"+cfg.Port, r); err != nil {

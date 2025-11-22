@@ -7,19 +7,19 @@ type (
 )
 
 const (
-	Breakfast Category = iota
-	Lunch
-	Dinner
-	Dessert
-	Snacks
-	Appetizer
-	Beverage
+	CategoryBreakfast Category = iota
+	CategoryLunch
+	CategoryDinner
+	CategoryDessert
+	CategorySnacks
+	CategoryAppetizer
+	CategoryBeverage
 )
 
 const (
-	Easy Difficulty = iota
-	Medium
-	Hard
+	DifficultyEasy Difficulty = iota
+	DifficultyMedium
+	DifficultyHard
 )
 
 type Author struct {

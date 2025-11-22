@@ -121,7 +121,8 @@ No `.env` file in repo; create one locally if needed.
    ```
 3. (Optional) Create `frontend/scripts/pages/newpage.ts` for client-side code
 4. (Optional) Create `frontend/styles/pages/newpage.css` for page-specific styles
-5. Run `make dev` to see changes with hot reload
+5. Run `make build` to make sure the build compiles successfully
+
 
 ### Working with Templ
 - Always run `templ generate` after editing `.templ` files

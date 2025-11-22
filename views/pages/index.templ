@@ -40,9 +40,10 @@ templ RecipeOfTheDaySection(r *recipe.Recipe) {
 			src={ r.Image }
 			alt={ r.Title }
 			class="absolute inset-0 w-full h-full object-cover"
+			sizes="100vw"
 		/>
 		<!-- Gradient Overlay -->
-		<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30"></div>
+		<div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/50 to-black/30"></div>
 		<!-- Content -->
 		<div class="relative z-10 flex h-full items-end">
 			<div class="w-full px-4 py-8 md:px-8 md:py-12 lg:px-12">
@@ -65,7 +66,7 @@ templ RecipeOfTheDaySection(r *recipe.Recipe) {
 					<!-- Stats -->
 					<div class="mb-6 flex flex-wrap items-center gap-4 text-sm text-white md:gap-6 md:text-base">
 						<div class="flex items-center gap-2">
-							@icons.ClockIcon("h-5 w-5 text-gray-300")
+							@icons.ClockSolidIcon("h-5 w-5 text-gray-300")
 							<span>{ fmt.Sprintf("%d minutes", r.PrepTime + r.CookTime) }</span>
 						</div>
 						<div class="flex items-center gap-2">
@@ -96,87 +97,94 @@ templ RecipeOfTheDaySection(r *recipe.Recipe) {
 }
 
 templ TrendingSection(recipes []recipe.Recipe) {
-	<section class="w-full bg-gray-50 py-12 md:py-16">
-		<div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">
+	<section class="w-full bg-gray-50 px-4 py-12 md:px-8 lg:px-12">
+		<div class="mx-auto max-w-7xl">
 			<!-- Section Header -->
-			<div class="mb-8">
-				<h2 class="text-3xl font-bold text-gray-900 md:text-4xl">Trending Recipes</h2>
-				<p class="mt-2 text-gray-600">Most popular recipes this week</p>
+			<div class="mb-8 flex items-center gap-3">
+				@icons.FireIcon("h-8 w-8 text-orange-500")
+				<h2 class="text-3xl font-bold text-gray-900 md:text-4xl">Trending Now</h2>
 			</div>
 			<!-- Horizontal Scrollable Container -->
 			<div class="relative">
 				<div
 					id="trending-container"
-					class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
-					style="scroll-behavior: smooth;"
+					class="scrollbar-hide flex gap-6 overflow-x-auto scroll-smooth pb-4"
 				>
 					for _, r := range recipes {
-						<div class="flex-none w-80 snap-start">
+						<div class="w-[280px] shrink-0 sm:w-[320px]">
 							@sharedcomponents_recipe.RecipeCard(&r)
 						</div>
 					}
 				</div>
-				<!-- Mobile Swipe Hint -->
-				<div class="mt-4 text-center text-sm text-gray-500 md:hidden">
-					Swipe to see more
-				</div>
+				<!-- Gradient Fade Hint (Desktop Only) -->
+				<div class="pointer-events-none absolute right-0 top-0 hidden h-full w-24 bg-linear-to-l from-gray-50 to-transparent md:block"></div>
 			</div>
+			<!-- Mobile Swipe Hint -->
+			<p class="mt-4 text-center text-sm text-gray-500 md:hidden">
+				Swipe to see more recipes →
+			</p>
 		</div>
 	</section>
 }
 
 templ SearchSection(categories []string) {
-	<section class="w-full bg-white py-12 md:py-16">
-		<div class="mx-auto max-w-7xl px-4 md:px-8 lg:px-12">
+	<section class="w-full bg-white px-4 py-12 md:px-8 lg:px-12">
+		<div class="mx-auto max-w-7xl">
 			<!-- Section Header -->
-			<div class="mb-8 text-center">
-				<h2 class="text-3xl font-bold text-gray-900 md:text-4xl">Find Your Perfect Recipe</h2>
-				<p class="mt-2 text-gray-600">Search by keyword or browse by category</p>
+			<div class="mb-8">
+				<h2 class="mb-2 text-3xl font-bold text-gray-900 md:text-4xl">Find Your Perfect Recipe</h2>
+				<p class="text-gray-600">Search by keyword or filter by category</p>
 			</div>
 			<!-- Search Input -->
-			<div class="mb-8">
-				<div class="relative mx-auto max-w-2xl">
-					<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-						@icons.MagnifyingGlassIcon("h-5 w-5 text-gray-400")
-					</div>
+			<div class="mb-6">
+				<div class="relative">
+					<!-- <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"> -->
+					@icons.MagnifyingGlassIcon("absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400")
+					<!-- </div> -->
 					<input
 						type="text"
 						id="search-input"
-						placeholder="Search recipes..."
-						class="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-4 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+						placeholder="Search recipes, ingredients, or keywords..."
+						class="w-full rounded-lg border border-gray-300 py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
 			</div>
 			<!-- Category Filters -->
-			<div class="mb-8 flex flex-wrap justify-center gap-3">
-				<button
-					class="category-filter rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-					data-category="All"
-				>
-					All
-				</button>
-				for _, cat := range categories {
+			<div class="mb-8">
+				<p class="mb-3 text-sm font-medium text-gray-700">Filter by Category:</p>
+				<div class="flex flex-wrap gap-2">
 					<button
-						class="category-filter rounded-full bg-gray-200 px-6 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-300"
-						data-category={ cat }
+						class="category-filter rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+						data-category="All"
 					>
-						{ cat }
+						All
 					</button>
-				}
+					for _, cat := range categories {
+						<button
+							class="category-filter rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
+							data-category={ cat }
+						>
+							{ cat }
+						</button>
+					}
+				</div>
 			</div>
 			<!-- Results Container -->
 			<div id="search-results" class="mt-8">
+				<!-- Results Count -->
+				<div id="results-count" class="mb-4 hidden text-sm text-gray-600"></div>
+				<!-- Initial State -->
+				<div id="initial-state" class="py-12 text-center text-gray-500">
+					<p>Start typing or select a category to search recipes</p>
+				</div>
 				<!-- Loading State -->
-				<div id="loading-state" class="hidden text-center py-12">
-					<div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-					<p class="mt-4 text-gray-600">Searching...</p>
+				<div id="loading-state" class="hidden items-center justify-center py-12">
+					<div class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+					<p class="ml-3 text-gray-600">Searching recipes...</p>
 				</div>
 				<!-- Empty State -->
-				<div id="empty-state" class="hidden text-center py-12">
-					<svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-					</svg>
-					<h3 class="mt-4 text-lg font-semibold text-gray-900">No recipes found</h3>
+				<div id="empty-state" class="hidden py-12 text-center">
+					<p class="text-xl font-semibold text-gray-900">No recipes found</p>
 					<p class="mt-2 text-gray-600">Try adjusting your search or filters</p>
 				</div>
 				<!-- Results Grid -->

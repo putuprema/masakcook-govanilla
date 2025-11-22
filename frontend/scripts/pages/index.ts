@@ -50,17 +50,20 @@ const DifficultyMap: Record<number, string> = {
 let currentKeyword = "";
 let currentCategory = "All";
 let debounceTimer: number | null = null;
+let hasSearched = false;
 
 // DOM Elements
 const searchInput = document.getElementById("search-input") as HTMLInputElement;
 const categoryFilters = document.querySelectorAll<HTMLButtonElement>(".category-filter");
 const resultsGrid = document.getElementById("results-grid");
+const resultsCount = document.getElementById("results-count");
+const initialState = document.getElementById("initial-state");
 const loadingState = document.getElementById("loading-state");
 const emptyState = document.getElementById("empty-state");
 
 // Initialize
 function init() {
-	if (!searchInput || !resultsGrid || !loadingState || !emptyState) {
+	if (!searchInput || !resultsGrid || !loadingState || !emptyState || !initialState || !resultsCount) {
 		console.error("Required DOM elements not found");
 		return;
 	}
@@ -73,8 +76,7 @@ function init() {
 		button.addEventListener("click", handleCategoryClick);
 	});
 
-	// Initial load - show all recipes
-	performSearch();
+	// Don't perform search on initial load - show initial state instead
 }
 
 // Handle search input with debouncing
@@ -101,11 +103,11 @@ function handleCategoryClick(e: Event) {
 	// Update active state
 	categoryFilters.forEach((btn) => {
 		if (btn === button) {
-			btn.classList.remove("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
+			btn.classList.remove("bg-gray-100", "text-gray-700", "hover:bg-gray-200");
 			btn.classList.add("bg-blue-600", "text-white", "hover:bg-blue-700");
 		} else {
 			btn.classList.remove("bg-blue-600", "text-white", "hover:bg-blue-700");
-			btn.classList.add("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
+			btn.classList.add("bg-gray-100", "text-gray-700", "hover:bg-gray-200");
 		}
 	});
 
@@ -115,7 +117,9 @@ function handleCategoryClick(e: Event) {
 
 // Perform search API call
 async function performSearch() {
-	if (!resultsGrid || !loadingState || !emptyState) return;
+	if (!resultsGrid || !loadingState || !emptyState || !initialState || !resultsCount) return;
+
+	hasSearched = true;
 
 	// Show loading state
 	showLoading();
@@ -136,6 +140,9 @@ async function performSearch() {
 
 		const data: SearchResponse = await response.json();
 
+		// Update results count
+		updateResultsCount(data.count);
+
 		// Update UI with results
 		renderResults(data.data);
 	} catch (error) {
@@ -144,19 +151,30 @@ async function performSearch() {
 	}
 }
 
+// Update results count display
+function updateResultsCount(count: number) {
+	if (!resultsCount) return;
+
+	resultsCount.textContent = `Found ${count} recipe${count !== 1 ? "s" : ""}`;
+	resultsCount.classList.remove("hidden");
+}
+
 // Show loading state
 function showLoading() {
-	if (!resultsGrid || !loadingState || !emptyState) return;
+	if (!resultsGrid || !loadingState || !emptyState || !initialState || !resultsCount) return;
 
+	initialState.classList.add("hidden");
 	resultsGrid.classList.add("hidden");
 	emptyState.classList.add("hidden");
+	resultsCount.classList.add("hidden");
 	loadingState.classList.remove("hidden");
 }
 
 // Show empty state
 function showEmpty() {
-	if (!resultsGrid || !loadingState || !emptyState) return;
+	if (!resultsGrid || !loadingState || !emptyState || !initialState || !resultsCount) return;
 
+	initialState.classList.add("hidden");
 	resultsGrid.classList.add("hidden");
 	loadingState.classList.add("hidden");
 	emptyState.classList.remove("hidden");
@@ -164,8 +182,9 @@ function showEmpty() {
 
 // Show results
 function showResults() {
-	if (!resultsGrid || !loadingState || !emptyState) return;
+	if (!resultsGrid || !loadingState || !emptyState || !initialState) return;
 
+	initialState.classList.add("hidden");
 	loadingState.classList.add("hidden");
 	emptyState.classList.add("hidden");
 	resultsGrid.classList.remove("hidden");
@@ -194,7 +213,7 @@ function renderResults(recipes: Recipe[]) {
 	});
 }
 
-// Create recipe card HTML element
+// Create recipe card HTML element (matching Next.js design)
 function createRecipeCard(recipe: Recipe): HTMLElement {
 	const totalTime = recipe.PrepTime + recipe.CookTime;
 	const category = CategoryMap[recipe.Category] || "Unknown";
@@ -202,21 +221,16 @@ function createRecipeCard(recipe: Recipe): HTMLElement {
 
 	const card = document.createElement("div");
 	card.className =
-		"group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden";
+		"group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-lg";
 
 	card.innerHTML = `
-		<div class="relative h-48 overflow-hidden">
+		<div class="relative h-48 w-full overflow-hidden bg-gray-200">
 			<img
 				src="${recipe.Image}"
 				alt="${recipe.Title}"
-				class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+				class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
 				loading="lazy"
 			/>
-			<div class="absolute top-3 left-3">
-				<span class="bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-					${category}
-				</span>
-			</div>
 			<button
 				class="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full transition-colors duration-200 save-button"
 				data-recipe-id="${recipe.ID}"
@@ -227,30 +241,32 @@ function createRecipeCard(recipe: Recipe): HTMLElement {
 				</svg>
 			</button>
 		</div>
-		<div class="p-5">
-			<h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+		<div class="flex flex-1 flex-col p-4">
+			<div class="mb-2">
+				<span class="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
+					${category}
+				</span>
+			</div>
+			<h3 class="mb-2 line-clamp-2 text-lg font-semibold text-gray-900">
 				${recipe.Title}
 			</h3>
-			<p class="text-gray-600 text-sm mb-4 line-clamp-2">
+			<p class="mb-4 line-clamp-2 flex-1 text-sm text-gray-600">
 				${recipe.Description}
 			</p>
-			<div class="flex items-center gap-4 mb-4 text-sm text-gray-500">
+			<div class="mb-4 flex items-center gap-4 text-sm text-gray-500">
 				<div class="flex items-center gap-1">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
 						<path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd"></path>
 					</svg>
 					<span>${totalTime} min</span>
 				</div>
-				<div class="flex items-center gap-1">
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-					</svg>
-					<span>${difficulty}</span>
+				<div class="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">
+					${difficulty}
 				</div>
 			</div>
 			<a
 				href="/recipe/${recipe.ID}"
-				class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200"
+				class="flex w-full items-center justify-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"></path>

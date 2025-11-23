@@ -24,7 +24,8 @@ func Metadata() *viewmodel.Metadata {
 }
 
 templ Index(vm *viewmodel.IndexViewModel) {
-	@layouts.Base(Metadata()) {
+	{{ pageScript := "/static/scripts/pages/index.js" }}
+	@layouts.Base(Metadata(), &pageScript) {
 		<div class="min-h-screen">
 			@RecipeOfTheDaySection(&vm.RecipeOfTheDay)
 			@TrendingSection(vm.TrendingRecipes)

@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"masakcook/views/sharedcomponents/icons"
 	recipe "masakcook/internal/business"
+	"encoding/json"
 )
 
 templ RecipeCard(r *recipe.Recipe) {
-	<div class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-lg">
+	{{ recipeJson, _ := json.Marshal(r) }}
+	<div data-component-type="RecipeCard" data-recipe={ string(recipeJson) } class="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-lg">
 		<!-- Image Container -->
 		<div class="relative h-48 w-full overflow-hidden bg-gray-200">
 			<img
@@ -20,11 +22,13 @@ templ RecipeCard(r *recipe.Recipe) {
 			<!-- Save Button -->
 			<button
 				type="button"
+				data-button-instance="RecipeCard__saveRecipeBtn"
 				class="absolute right-2 top-2 rounded-full bg-white/90 p-2 shadow-md transition-colors hover:bg-white"
 				data-recipe-id={ r.ID }
 				aria-label="Save recipe"
 			>
-				@icons.HeartIcon("w-5 h-5 text-gray-600")
+				@icons.HeartIcon("RecipeCard__heartDisabledIcon", "w-5 h-5 text-gray-700")
+				@icons.HeartSolidIcon("RecipeCard__heartEnabledIcon", "hidden w-5 h-5 text-red-500")
 			</button>
 		</div>
 		<!-- Content -->

@@ -1,4 +1,11 @@
 {
+	"linter": {
+		"rules": {
+			"style": {
+				"noNonNullAssertion": "off"
+			}
+		}
+	},
 	"css": {
 		"parser": {
 			"tailwindDirectives": true

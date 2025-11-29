@@ -22,6 +22,10 @@ const savedRecipesContext = new Proxy(_savedRecipesContext, {
 	},
 });
 
+const notify = () => {
+	document.dispatchEvent(new CustomEvent(eventTypes.savedRecipesChanged));
+};
+
 export const getSavedRecipes = () => savedRecipesContext.savedRecipes;
 
 export const initialize = () => {
@@ -32,10 +36,6 @@ export const initialize = () => {
 		savedRecipesContext.savedRecipes = savedRecipeParsed;
 	}
 	isInitialized = true;
-};
-
-const notify = () => {
-	document.dispatchEvent(new CustomEvent(eventTypes.savedRecipesChanged));
 };
 
 export const isSaved = (recipe: Recipe) =>

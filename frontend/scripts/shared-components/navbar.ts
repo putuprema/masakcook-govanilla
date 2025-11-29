@@ -1,5 +1,6 @@
 import * as savedRecipesContext from "../contexts/saved-recipes";
 import * as eventTypes from "../types/custom-events";
+import * as savedRecipesModal from "./recipe/saved-recipes-modal";
 
 let navbarEl: HTMLElement | null = null;
 
@@ -12,6 +13,10 @@ export const initialize = () => {
 			"navbar.initialize(): Cannot attach to navbar: Element not found.",
 		);
 	}
+
+	navbarEl
+		.querySelector("#nav__bookmarkBtn")
+		?.addEventListener("click", savedRecipesModal.toggle);
 
 	updateNavbar();
 	document.addEventListener(eventTypes.savedRecipesChanged, updateNavbar);

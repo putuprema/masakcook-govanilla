@@ -1,3 +1,19 @@
+export enum RecipeCategory {
+	Breakfast,
+	Lunch,
+	Dinner,
+	Dessert,
+	Snacks,
+	Appetizer,
+	Beverage,
+}
+
+export enum RecipeDifficulty {
+	Easy,
+	Medium,
+	Hard,
+}
+
 export interface Recipe {
 	ID: string;
 	Title: string;
@@ -6,8 +22,8 @@ export interface Recipe {
 	Ingredients: string[];
 	Instructions: string[];
 	Servings: number;
-	Category: number;
-	Difficulty: number;
+	Category: RecipeCategory;
+	Difficulty: RecipeDifficulty;
 	PrepTime: number;
 	CookTime: number;
 	Author: {

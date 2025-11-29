@@ -1,6 +1,6 @@
-import { isSaved, toggleSaveRecipe } from "../../contexts/saved-recipes";
-import * as eventTypes from "../../types/custom-events";
-import type { Recipe } from "../../types/recipe";
+import { isSaved, toggleSaveRecipe } from "../contexts/saved-recipes";
+import * as eventTypes from "../types/custom-events";
+import type { Recipe } from "../types/recipe";
 
 export const initialize = (card: HTMLDivElement) => {
 	if (!card.matches('[data-component-type="RecipeCard"]')) {

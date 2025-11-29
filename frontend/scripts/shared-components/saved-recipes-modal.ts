@@ -1,6 +1,6 @@
-import * as savedRecipesContext from "../../contexts/saved-recipes";
-import * as eventTypes from "../../types/custom-events";
-import { RecipeCategory } from "../../types/recipe";
+import * as savedRecipesContext from "../contexts/saved-recipes";
+import * as eventTypes from "../types/custom-events";
+import { RecipeCategory } from "../types/recipe";
 
 let savedRecipesModalEl: HTMLDivElement | null = null;
 

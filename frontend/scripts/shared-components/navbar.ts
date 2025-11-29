@@ -1,6 +1,6 @@
 import * as savedRecipesContext from "../contexts/saved-recipes";
 import * as eventTypes from "../types/custom-events";
-import * as savedRecipesModal from "./recipe/saved-recipes-modal";
+import * as savedRecipesModal from "./saved-recipes-modal";
 
 let navbarEl: HTMLElement | null = null;
 

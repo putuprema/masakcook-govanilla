@@ -1,4 +1,4 @@
-import * as recipeCard from "../shared-components/recipe/recipe-card";
+import * as recipeCard from "../shared-components/recipe-card";
 
 document.addEventListener("DOMContentLoaded", () => {
 	// Bind to all recipe cards in the Trending Now section

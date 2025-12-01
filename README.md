@@ -1,6 +1,7 @@
 # MasakCook - Recipe Sharing Web App
 
 A modern, crowd-sourced recipe web application built with Golang, Vanilla Web Stack (HTML/CSS/TS), and Tailwind CSS v4.
+This is a recreation of the same app previously built with Next.js. Check out the repo of the Next.js version [here](https://github.com/putuprema/masakcook).
 
 ## Features
 
@@ -107,8 +108,8 @@ A dropdown-style modal for managing saved recipes:
 
 ## Best Practices
 
-✅ **Golang, Chi, Templ** - Latest patterns and features, HTML streaming for dynamic data
-✅ **TypeScript** - Full type safety
-✅ **Accessibility** - ARIA labels, semantic HTML
-✅ **Code Quality** - Biome & Golang linting, consistent formatting
-✅ **Responsive** - Mobile-first design
+- ✅ **Golang, Chi, Templ** - Latest patterns and features, HTML streaming for dynamic data
+- ✅ **TypeScript** - Full type safety
+- ✅ **Accessibility** - ARIA labels, semantic HTML
+- ✅ **Code Quality** - Biome & Golang linting, consistent formatting
+- ✅ **Responsive** - Mobile-first design

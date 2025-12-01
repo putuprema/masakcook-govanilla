@@ -4,6 +4,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"sync"
 
 	"masakcook/internal/config"
 	"masakcook/internal/data"
@@ -30,11 +31,35 @@ func main() {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		vm := &viewmodel.IndexViewModel{
-			RecipeOfTheDay:  data.GetRecipeOfTheDay(),
-			TrendingRecipes: data.GetTrendingRecipes(12),
-			Categories:      data.GetCategories(),
+			Categories: data.GetCategories(),
 		}
-		templ.Handler(pages.Index(vm)).ServeHTTP(w, r)
+
+		slotContents := make(chan data.SlotContents)
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		// Partial async streaming for Recipe Of The Day section
+		go func() {
+			defer wg.Done()
+			recipeOfTheDay := data.GetRecipeOfTheDay()
+			slotContents <- data.SlotContents{Name: "recipeOfTheDay", Contents: pages.RecipeOfTheDaySection(&recipeOfTheDay)}
+		}()
+
+		// Partial async streaming for Trending Recipes section
+		go func() {
+			defer wg.Done()
+			trendingRecipes := data.GetTrendingRecipes(12)
+			slotContents <- data.SlotContents{Name: "trendingRecipes", Contents: pages.TrendingItemsContainer(trendingRecipes)}
+		}()
+
+		// Close the stream once all completed
+		go func() {
+			wg.Wait()
+			close(slotContents)
+		}()
+
+		templ.Handler(pages.Index(vm, slotContents), templ.WithStreaming()).ServeHTTP(w, r)
 	})
 
 	r.Get("/api/recipes/search", func(w http.ResponseWriter, r *http.Request) {

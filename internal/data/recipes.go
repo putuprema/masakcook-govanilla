@@ -2,6 +2,7 @@ package data
 
 import (
 	"strings"
+	"time"
 
 	recipe "masakcook/internal/business"
 )
@@ -319,6 +320,7 @@ var mockRecipes = []recipe.Recipe{
 
 // GetRecipeOfTheDay returns the recipe of the day based on current date
 func GetRecipeOfTheDay() recipe.Recipe {
+	time.Sleep(1 * time.Second)
 	// Use day of month to select a recipe (1-12 maps to recipe 0-11)
 	day := 22 // Simulated day
 	index := (day - 1) % len(mockRecipes)
@@ -327,6 +329,8 @@ func GetRecipeOfTheDay() recipe.Recipe {
 
 // GetTrendingRecipes returns the most popular recipes sorted by saves + likes
 func GetTrendingRecipes(limit int) []recipe.Recipe {
+	time.Sleep(2 * time.Second)
+
 	// Create a copy to avoid modifying original
 	recipes := make([]recipe.Recipe, len(mockRecipes))
 	copy(recipes, mockRecipes)
@@ -351,6 +355,8 @@ func GetTrendingRecipes(limit int) []recipe.Recipe {
 
 // SearchRecipes filters recipes by keyword and category
 func SearchRecipes(keyword, category string) []recipe.Recipe {
+	time.Sleep(1 * time.Second)
+
 	var results []recipe.Recipe
 
 	keyword = strings.ToLower(keyword)

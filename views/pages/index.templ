@@ -23,15 +23,35 @@ func Metadata() *viewmodel.Metadata {
 	}
 }
 
-templ Index(vm *viewmodel.IndexViewModel) {
+templ Index(vm *viewmodel.IndexViewModel, data chan data.SlotContents) {
 	{{ pageScript := "/static/scripts/pages/index.js" }}
 	@layouts.Base(Metadata(), &pageScript) {
 		<div class="min-h-screen">
-			@RecipeOfTheDaySection(&vm.RecipeOfTheDay)
-			@TrendingSection(vm.TrendingRecipes)
+			@templ.Flush() {
+				<template shadowrootmode="open">
+					<style>
+            @import "static/styles/global.css";
+          </style>
+					<slot name="recipeOfTheDay">
+						@RecipeOfTheDaySkeleton()
+					</slot>
+					@TrendingSection()
+				</template>
+			}
+			for sc := range data {
+				@templ.Flush() {
+					<div slot={ sc.Name }>
+						@sc.Contents
+					</div>
+				}
+			}
 			@SearchSection(vm.Categories)
 		</div>
 	}
+}
+
+templ RecipeOfTheDaySkeleton() {
+	<div class="h-[500px] w-full animate-pulse bg-gray-300 md:h-[600px]"></div>
 }
 
 templ RecipeOfTheDaySection(r *recipe.Recipe) {
@@ -97,7 +117,16 @@ templ RecipeOfTheDaySection(r *recipe.Recipe) {
 	</section>
 }
 
-templ TrendingSection(recipes []recipe.Recipe) {
+templ TrendingSkeleton() {
+	<div class="flex gap-6 overflow-hidden">
+		<div class="h-96 w-[280px] shrink-0 animate-pulse rounded-lg bg-gray-300 sm:w-[320px]"></div>
+		<div class="h-96 w-[280px] shrink-0 animate-pulse rounded-lg bg-gray-300 sm:w-[320px]"></div>
+		<div class="h-96 w-[280px] shrink-0 animate-pulse rounded-lg bg-gray-300 sm:w-[320px]"></div>
+		<div class="h-96 w-[280px] shrink-0 animate-pulse rounded-lg bg-gray-300 sm:w-[320px]"></div>
+	</div>
+}
+
+templ TrendingSection() {
 	<section class="w-full bg-gray-50 px-4 py-12 md:px-8 lg:px-12">
 		<div class="mx-auto max-w-7xl">
 			<!-- Section Header -->
@@ -105,27 +134,33 @@ templ TrendingSection(recipes []recipe.Recipe) {
 				@icons.FireIcon("h-8 w-8 text-orange-500")
 				<h2 class="text-3xl font-bold text-gray-900 md:text-4xl">Trending Now</h2>
 			</div>
-			<!-- Horizontal Scrollable Container -->
-			<div class="relative">
-				<div
-					id="trending-container"
-					class="scrollbar-hide flex gap-6 overflow-x-auto scroll-smooth pb-4"
-				>
-					for _, r := range recipes {
-						<div class="w-[280px] shrink-0 sm:w-[320px]">
-							@sharedcomponents_recipe.RecipeCard(&r)
-						</div>
-					}
-				</div>
-				<!-- Gradient Fade Hint (Desktop Only) -->
-				<div class="pointer-events-none absolute right-0 top-0 hidden h-full w-24 bg-linear-to-l from-gray-50 to-transparent md:block"></div>
-			</div>
+			<slot name="trendingRecipes">
+				@TrendingSkeleton()
+			</slot>
 			<!-- Mobile Swipe Hint -->
 			<p class="mt-4 text-center text-sm text-gray-500 md:hidden">
 				Swipe to see more recipes →
 			</p>
 		</div>
 	</section>
+}
+
+templ TrendingItemsContainer(recipes []recipe.Recipe) {
+	<!-- Horizontal Scrollable Container -->
+	<div slot="trendingRecipes" class="relative">
+		<div
+			id="trending-container"
+			class="scrollbar-hide flex gap-6 overflow-x-auto scroll-smooth pb-4"
+		>
+			for _, r := range recipes {
+				<div class="w-[280px] shrink-0 sm:w-[320px]">
+					@sharedcomponents_recipe.RecipeCard(&r)
+				</div>
+			}
+		</div>
+		<!-- Gradient Fade Hint (Desktop Only) -->
+		<div class="pointer-events-none absolute right-0 top-0 hidden h-full w-24 bg-linear-to-l from-gray-50 to-transparent md:block"></div>
+	</div>
 }
 
 templ SearchSection(categories []string) {

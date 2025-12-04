@@ -36,6 +36,7 @@ templ Index(vm *viewmodel.IndexViewModel, data chan data.SlotContents) {
 						@RecipeOfTheDaySkeleton()
 					</slot>
 					@TrendingSection()
+					@SearchSection(vm.Categories)
 				</template>
 			}
 			for sc := range data {
@@ -45,7 +46,6 @@ templ Index(vm *viewmodel.IndexViewModel, data chan data.SlotContents) {
 					</div>
 				}
 			}
-			@SearchSection(vm.Categories)
 		</div>
 	}
 }

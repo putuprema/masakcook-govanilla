@@ -30,8 +30,8 @@ templ Base(meta *viewmodel.Metadata, pageScript *string) {
 		</head>
 		<body class="antialiased">
 			@sharedcomponents.Navbar()
+			<script async type="module" src="/static/scripts/global.js"></script>
 			{ children... }
-			<script type="module" src="/static/scripts/global.js"></script>
 			if pageScript != nil {
 				<script type="module" src={ *pageScript }></script>
 			}
